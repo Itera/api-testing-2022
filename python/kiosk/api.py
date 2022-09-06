@@ -84,7 +84,7 @@ class Cart(Resource):
         except:
             abort(404)
 
-    @ns.doc(description='Delete all items from cart.')
+    @ns.doc(description='Delete an item from cart.')
     @ns.expect(ns.model('DeleteFromCartRequest', {
         'item_id': fields.Integer,
     }))
