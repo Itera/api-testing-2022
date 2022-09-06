@@ -4,48 +4,60 @@ Some description here.
 
 ## Prerequisites
 
-It is assumed Python 3.x is available.
-
-## Run in unix (-like) shell
-
-Initiate virtual environment and install required dependencies with:
+It is assumed Python 3.x is available. To check the current version of Python,
+run
 
 ```
-./init.sh
+python --version
 ```
 
-Activate the virtual environment and enable Flask dev-mode:
+If the default version is 2.x, you should probably run the commands below with
+`python3` instead.
+
+## Initial setup
+
+Install dependencies with
 
 ```
-source ./venv/Scripts/activate
+python -m pip install -r requirements.txt
+```
+
+If you're having certificate issues (typically due to a proxy), you could tell
+Python to trust the two hosts:
+
+```
+python -m pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+```
+
+## Run the service
+
+Flask has a "development mode", which will automatically reload your service
+whenever the source changes. To enable, you'll need to set and environment
+variable.
+
+On Unix-like systems:
+
+```
 FLASK_ENV=development
 ```
 
-Finally, run your Python application with Flask:
+or on the Windows Command Line:
 
 ```
-flask run
-```
-
-## Run in CMD
-
-Initiate virtual environment and install required dependencies with:
-
-```
-.\init.bat
-```
-
-Activate the virtual environment and enable Flask dev-mode:
-
-```
-.\venv\Scripts\activate.bat
 SET FLASK_ENV=development
 ```
 
-Finally, run your Python application with Flask:
+Now run Flask, it will automatically load `app.py` if available:
 
 ```
 flask run
+```
+
+If this doesn't work properly for some reason, you may want to try to run it
+with Python:
+
+```
+python -m flask run
 ```
 
 ## Swagger UI
