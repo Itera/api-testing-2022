@@ -8,7 +8,7 @@ from kiosk import carts, items, session
 
 app = Flask(__name__)
 api = Api(app)
-ns = api.namespace('Kiosk', path='/kiosk')
+ns = api.namespace('Kiosk', path='/')
 
 authHeader = api.parser()
 authHeader.add_argument('Session-Id', location='headers')
@@ -67,16 +67,18 @@ class Cart(Resource):
 
         return carts.add_to_cart(session_id, item)
 
+
+@ns.route('/cart/<int:item_id>')
+@ns.expect(authHeader)
+class CartItem(Resource):
     @ns.doc(description='Update the amount of an item in cart.')
     @ns.expect(ns.model('UpdateCartRequest', {
-        'item_id': fields.Integer,
         'count': fields.Integer,
     }))
-    def put(self):
+    def put(self, item_id):
         session_id = get_session_id()
 
         payload = request.get_json()
-        item_id = payload.get('item_id', None)
         count = payload.get('count', None)
 
         try:
@@ -85,13 +87,8 @@ class Cart(Resource):
             abort(404)
 
     @ns.doc(description='Delete an item from cart.')
-    @ns.expect(ns.model('DeleteFromCartRequest', {
-        'item_id': fields.Integer,
-    }))
-    def delete(self):
+    def delete(self, item_id):
         session_id = get_session_id()
-        payload = request.get_json()
-        item_id = payload.get('item_id', None)
 
         try:
             return carts.update_cart(session_id, item_id, 0)
