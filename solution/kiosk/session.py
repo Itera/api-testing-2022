@@ -1,6 +1,5 @@
 import secrets
 
-
 TOKEN_SIZE = 16  # bytes
 SESSIONS = {}
 

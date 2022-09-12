@@ -1,18 +1,16 @@
 import re
-
 from flask import abort, Flask, jsonify, request
-
 from kiosk import carts, items, session
 
 app = Flask(__name__)
 
 
-@app.get('/items')
+@app.get('/kiosk/items')
 def get_items():
     return jsonify(items.list_items())
 
 
-@app.post('/users')
+@app.post('/kiosk/users')
 def create_user():
     payload = request.get_json()
     first = payload.get('first_name', '')
@@ -24,18 +22,18 @@ def create_user():
     if len(last) == 0 or re.search('[^a-zA-Z0-9 ]', last) is not None:
         abort(400)
 
-    return session.create_session(first, last)
+    return jsonify(session.create_session(first, last))
 
 
-@app.get('/cart')
+@app.get('/kiosk/cart')
 def view_cart():
-    session_id = get_session_id()
+    session_id = _get_session_id()
     return jsonify(carts.get_cart(session_id))
 
 
-@app.post('/cart')
+@app.post('/kiosk/cart')
 def add_to_cart():
-    session_id = get_session_id()
+    session_id = _get_session_id()
 
     payload = request.get_json()
     item_id = payload.get('item_id', None)
@@ -48,9 +46,9 @@ def add_to_cart():
     return jsonify(carts.add_to_cart(session_id, item))
 
 
-@app.put('/cart/<int:item_id>')
+@app.put('/kiosk/cart/<int:item_id>')
 def modify_count(item_id):
-    session_id = get_session_id()
+    session_id = _get_session_id()
 
     payload = request.get_json()
     count = payload.get('count', None)
@@ -61,9 +59,9 @@ def modify_count(item_id):
         abort(404)
 
 
-@app.delete('/cart/<int:item_id>')
+@app.delete('/kiosk/cart/<int:item_id>')
 def delete_from_cart(item_id):
-    session_id = get_session_id()
+    session_id = _get_session_id()
 
     try:
         return jsonify(carts.update_cart(session_id, item_id, 0))
@@ -71,7 +69,7 @@ def delete_from_cart(item_id):
         abort(404)
 
 
-def get_session_id():
+def _get_session_id():
     session_id = request.headers.get('Session-Id')
 
     if session_id is None:

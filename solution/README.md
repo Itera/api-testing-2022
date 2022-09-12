@@ -1,4 +1,4 @@
-# Simple Flask app with Swagger UI
+# Simple Flask app
 
 Some description here.
 
@@ -47,7 +47,8 @@ or on the Windows Command Line:
 SET FLASK_ENV=development
 ```
 
-Now run Flask, it will automatically load `app.py` if available:
+Now run Flask from the app folder, it will automatically load `app.py` if
+available:
 
 ```
 flask run
@@ -62,4 +63,5 @@ python -m flask run
 
 ## Swagger UI
 
-Swagger UI should now be available at http://localhost:5000 .
+For the `kiosk_swagger` app, Swagger UI should now be available at
+http://localhost:5000 .

@@ -1,0 +1,285 @@
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "paths": {
+        "/kiosk/cart": {
+            "parameters": [
+                {
+                    "name": "Session-Id",
+                    "in": "header",
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Item not found"
+                    },
+                    "403": {
+                        "description": "Invalid Session-Id header"
+                    },
+                    "401": {
+                        "description": "No Session-Id header"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/CartItem"
+                            }
+                        }
+                    }
+                },
+                "description": "Add item to cart.",
+                "operationId": "post_cart",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/AddToCartRequest"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Kiosk"
+                ]
+            },
+            "get": {
+                "responses": {
+                    "403": {
+                        "description": "Invalid Session-Id header"
+                    },
+                    "401": {
+                        "description": "No Session-Id header"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/CartItem"
+                            }
+                        }
+                    }
+                },
+                "description": "Get items in cart.",
+                "operationId": "get_cart",
+                "tags": [
+                    "Kiosk"
+                ]
+            }
+        },
+        "/kiosk/cart/{item_id}": {
+            "parameters": [
+                {
+                    "name": "Session-Id",
+                    "in": "header",
+                    "type": "string"
+                },
+                {
+                    "name": "item_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "put": {
+                "responses": {
+                    "404": {
+                        "description": "Item not found in cart"
+                    },
+                    "403": {
+                        "description": "Invalid Session-Id header"
+                    },
+                    "401": {
+                        "description": "No Session-Id header"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/CartItem"
+                            }
+                        }
+                    }
+                },
+                "description": "Update the amount of an item in cart.",
+                "operationId": "put_cart_item",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/UpdateCartRequest"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Kiosk"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "404": {
+                        "description": "Item not found in cart"
+                    },
+                    "403": {
+                        "description": "Invalid Session-Id header"
+                    },
+                    "401": {
+                        "description": "No Session-Id header"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/CartItem"
+                            }
+                        }
+                    }
+                },
+                "description": "Delete an item from cart.",
+                "operationId": "delete_cart_item",
+                "tags": [
+                    "Kiosk"
+                ]
+            }
+        },
+        "/kiosk/items": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Item"
+                            }
+                        }
+                    }
+                },
+                "description": "Get a list of all available items.",
+                "operationId": "get_items",
+                "tags": [
+                    "Kiosk"
+                ]
+            }
+        },
+        "/kiosk/users": {
+            "post": {
+                "responses": {
+                    "400": {
+                        "description": "Invalid first or last name given"
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "description": "Create a new user session.",
+                "operationId": "post_users",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/CreateUserRequest"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Kiosk"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "API",
+        "version": "1.0"
+    },
+    "produces": [
+        "application/json"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "tags": [
+        {
+            "name": "Kiosk"
+        }
+    ],
+    "definitions": {
+        "Item": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CreateUserRequest": {
+            "properties": {
+                "first_name": {
+                    "type": "string",
+                    "default": "Tom"
+                },
+                "last_name": {
+                    "type": "string",
+                    "default": "Testersen"
+                }
+            },
+            "type": "object"
+        },
+        "AddToCartRequest": {
+            "properties": {
+                "item_id": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CartItem": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Item"
+                },
+                {
+                    "properties": {
+                        "count": {
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "UpdateCartRequest": {
+            "properties": {
+                "count": {
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "responses": {
+        "ParseError": {
+            "description": "When a mask can't be parsed"
+        },
+        "MaskError": {
+            "description": "When any error occurs on mask"
+        }
+    }
+}
