@@ -36,7 +36,7 @@ python -m pip install --trusted-host pypi.org --trusted-host files.pythonhosted.
 
 ## Install postman
 
-See https://www.postman.com/downloads/ .
+See https://www.postman.com/downloads/
 
 # Tasks
 
@@ -50,8 +50,9 @@ Run the app with
 
     python -m flask run
 
-This starts your app on port http://localhost:5000 .
-
+This starts your app on port http://localhost:5000 
+   
+   
 ### 1. Create a GET endpoint to get a list of available items
 
 Example of a list of items:
