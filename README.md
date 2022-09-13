@@ -35,21 +35,22 @@ python -m pip install --trusted-host pypi.org --trusted-host files.pythonhosted.
 
 # Tasks:
 
-### 1. Create a get enpoint to get a list of availble items  
- List of items example: 
+### 1. Create a get endpoint to get a list of availble items  
+ Example of a list of items: 
 
     ITEMS = [
         {'id': 0, 'name': 'Bannana'},
         {'id': 1, 'name': 'Apple'},
     ]
 
-Code example:
+Example code for a get endpoint:
 
     @app.get('/kiosk/items')
     def get_items():
         return jsonify(ITEMS)
 
 ### 2. Create a cart POST api to add an item to you shopping cart
+
 You will need to create a cart of some kind, a simple array of items:
     
     {
@@ -59,7 +60,15 @@ You will need to create a cart of some kind, a simple array of items:
     } 
 Or you can steal our implentation from the solution: [solution/kiosk/cart.py](https://github.com/Itera/api-testing-2022/blob/main/solution/kiosk/carts.py)
 
-### 3. Create a cart GET enpoint to get items in cart
+The item from cart should be sendt and retrived from the body:
+
+    @app.post('/kiosk/cart')
+    def add_to_cart():
+        payload = request.get_json()
+        item_id = payload.get('item_id', None)
+  
+### 3. Create a cart GET endpoint to get items in cart
+This is easy now yes ? If its not look at what you did in the first task ;) 
   
 ### 4. Create a cart PUT endpoint for updating amount of an item in the cart
 The put endpoint should get item_id from the url:
@@ -75,7 +84,7 @@ The user endpoint should take in first and last name from the body and return a 
 
     session_id = secrets.token_urlsafe(TOKEN_SIZE)
   
-### 7. Add session id as requirement in the header to cart enpoints to "secure" them
+### 7. Add session id as requirement in the header to cart endpoints to "secure" them
 Check if session_id exists in the header:
     
     session_id = request.headers.get('Session-Id')
