@@ -1,6 +1,13 @@
 # Setup
 
 ## Install Python if you don't already have it
+You can download it from [here](https://www.python.org/downloads/)
+
+Alternativly on windows you can run 
+
+```    
+winget install -e --id Python.Python.3
+```
 
 It is assumed Python 3.x is available. To check the current version of Python,
 run
