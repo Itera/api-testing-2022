@@ -1,0 +1,430 @@
+{
+	"info": {
+		"_postman_id": "ecdd7ef0-94fd-40a0-a0b7-eb422ebca1f7",
+		"name": "API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23174693"
+	},
+	"item": [
+		{
+			"name": "kiosk",
+			"item": [
+				{
+					"name": "cart",
+					"item": [
+						{
+							"name": "{item id}",
+							"item": [
+								{
+									"name": "delete cart item",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"//const bananas = pm.collectionVariables.get('bananaItemID');"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const body = pm.response.json();\r",
+													"\r",
+													"pm.test('successfully removed item from cart', () => {\r",
+													"    pm.response.to.have.status(200);\r",
+													"\r",
+													"    const updatedBananaCount = 0;\r",
+													"    pm.collectionVariables.set(\"bananaCount\", updatedBananaCount);\r",
+													"})"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Session-Id",
+												"value": "{{userSessionId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/kiosk/cart/:item_id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"kiosk",
+												"cart",
+												":item_id"
+											],
+											"variable": [
+												{
+													"key": "item_id",
+													"value": "{{bananaItemID}}",
+													"description": "(Required) "
+												}
+											]
+										},
+										"description": "Delete an item from cart."
+									},
+									"response": []
+								},
+								{
+									"name": "put cart item",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"expect 404 for updating apples amount\", () => {\r",
+													"    pm.response.to.have.status(404);\r",
+													"})"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"const apples = pm.collectionVariables.get(\"appleItemID\");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Session-Id",
+												"value": "{{userSessionId}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"count\": 10\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/kiosk/cart/:item_id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"kiosk",
+												"cart",
+												":item_id"
+											],
+											"variable": [
+												{
+													"key": "item_id",
+													"value": "{{apples}}",
+													"description": "(Required) "
+												}
+											]
+										},
+										"description": "Update the amount of an item in cart."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "get cart",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const body = pm.response.json(); \r",
+											"const bananaCount = body[pm.collectionVariables.get(\"bananaItemID\")].count;\r",
+											"\r",
+											"pm.test(\"Check expected vs actual fruit amount in cart\", () => {\r",
+											"    pm.expect(bananaCount).eql(pm.collectionVariables.get(\"bananaCount\"))\r",
+											"})\r",
+											"\r",
+											"postman.setNextRequest(null);\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Session-Id",
+										"value": "{{userSessionId}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/kiosk/cart",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"kiosk",
+										"cart"
+									]
+								},
+								"description": "Get items in cart."
+							},
+							"response": []
+						},
+						{
+							"name": "post cart",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const body = pm.response.json();\r",
+											"\r",
+											"pm.test(\"expect successfull send\", () => {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})\r",
+											"\r",
+											"const bananaCount = body[pm.collectionVariables.get(\"bananaItemID\")].count\r",
+											"console.log(\"Amount of bananas: \" + bananaCount);\r",
+											"\r",
+											"pm.collectionVariables.set(\"bananaCount\", bananaCount);\r",
+											"\r",
+											"var i = pm.collectionVariables.get(\"index\");\r",
+											"\r",
+											"if(i < 3){\r",
+											"    pm.collectionVariables.set(\"index\", i + 1);\r",
+											"    postman.setNextRequest(\"post cart\");\r",
+											"}else{\r",
+											"    postman.setNextRequest(\"get cart\");\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Session-Id",
+										"value": "{{userSessionId}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"item_id\": {{bananaItemID}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/kiosk/cart",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"kiosk",
+										"cart"
+									]
+								},
+								"description": "Add item to cart."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "get items",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"expect successful 200\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"const body = pm.response.json();\r",
+									"\r",
+									"// Save the values as collection variables instead of local, because we need them for other requests\r",
+									"pm.collectionVariables.set(\"bananaItemID\", body[0].id);\r",
+									"pm.collectionVariables.set(\"pinappleItemID\", body[1].id);\r",
+									"pm.collectionVariables.set(\"appleItemID\", body[2].id);\r",
+									"\r",
+									"// To be used later\r",
+									"pm.collectionVariables.set(\"index\", 0);\r",
+									"\r",
+									"postman.setNextRequest(\"post cart\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/kiosk/items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"kiosk",
+								"items"
+							]
+						},
+						"description": "Get a list of all available items."
+					},
+					"response": []
+				},
+				{
+					"name": "post users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"customerFirstname\", \"Donald\");\r",
+									"pm.variables.set(\"customerLastname\", \"Duck\");\r",
+									"\r",
+									"// Variable / CSV"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"expect successful 200\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"expect body not be empty\", () => {\r",
+									"    pm.expect(pm.response.body).not.equal(null)\r",
+									"})\r",
+									"\r",
+									"const body = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('userSessionId', body);\r",
+									"\r",
+									"// Tells collection runner which request to run next\r",
+									"postman.setNextRequest(\"get items\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \n  \"first_name\": \"{{customerFirstname}}\",\n  \"last_name\": \"{{customerLastname}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/kiosk/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"kiosk",
+								"users"
+							]
+						},
+						"description": "Create a new user session."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/",
+			"type": "string"
+		},
+		{
+			"key": "userSessionId",
+			"value": ""
+		},
+		{
+			"key": "bananaItemID",
+			"value": ""
+		},
+		{
+			"key": "pinappleItemID",
+			"value": ""
+		},
+		{
+			"key": "appleItemID",
+			"value": ""
+		},
+		{
+			"key": "index",
+			"value": ""
+		},
+		{
+			"key": "bananaCount",
+			"value": ""
+		}
+	]
+}
