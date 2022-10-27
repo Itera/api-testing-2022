@@ -1,7 +1,9 @@
-import re
 from flask import abort, Flask, request
-from flask_restx import Api, fields, marshal_with, Resource
-from kiosk_swagger import carts, items, session
+from flask_restx import Api, fields, Resource
+
+import carts
+import items
+import sessions
 
 app = Flask(__name__)
 api = Api(app)
@@ -25,30 +27,7 @@ class Items(Resource):
     @ns.doc(description='Get a list of all available items.')
     @ns.response(200, 'Success', [itemModel])
     def get(self):
-        return items.list_items()
-
-
-@ns.route('/users')
-class Users(Resource):
-    @ns.doc(description='Create a new user session.')
-    @ns.expect(ns.model('CreateUserRequest', {
-        'first_name': fields.String(default='Tom'),
-        'last_name': fields.String(default='Testersen'),
-    }))
-    @ns.response(200, 'Success', fields.String)
-    @ns.response(400, 'Invalid first or last name given')
-    def post(self):
-        payload = request.get_json()
-        first = payload.get('first_name', '')
-        last = payload.get('last_name', '')
-
-        if len(first) == 0 or re.search('[^a-zA-Z0-9 \\-]', first) is not None:
-            abort(400)
-
-        if len(last) == 0 or re.search('[^a-zA-Z0-9 \\-]', last) is not None:
-            abort(400)
-
-        return session.create_session(first, last)
+        return items.list()
 
 
 @ns.route('/cart')
@@ -59,8 +38,9 @@ class Cart(Resource):
     @ns.response(401, 'No Session-Id header')
     @ns.response(403, 'Invalid Session-Id header')
     def get(self):
-        session_id = _get_session_id()
-        return carts.get_cart(session_id)
+        session_id = check_session()
+        cart = carts.get(session_id)
+        return cart
 
     @ns.doc(description='Add item to cart.')
     @ns.expect(ns.model('AddToCartRequest', {
@@ -71,17 +51,18 @@ class Cart(Resource):
     @ns.response(403, 'Invalid Session-Id header')
     @ns.response(404, 'Item not found')
     def post(self):
-        session_id = _get_session_id()
+        session_id = check_session()
 
         payload = request.get_json()
         item_id = payload.get('item_id', None)
 
-        try:
-            item = items.get_item(item_id)
-        except:
-            abort(404)
+        item = items.get(item_id)
+        if item is None:
+            # Item does not exist.
+            abort(400)  # TODO: 400 bad request?
 
-        return carts.add_to_cart(session_id, item)
+        cart = carts.add(session_id, item)
+        return cart
 
 
 @ns.route('/cart/<int:item_id>')
@@ -96,15 +77,22 @@ class CartItem(Resource):
     @ns.response(403, 'Invalid Session-Id header')
     @ns.response(404, 'Item not found in cart')
     def put(self, item_id):
-        session_id = _get_session_id()
+        session_id = check_session()
 
         payload = request.get_json()
         count = payload.get('count', None)
 
-        try:
-            return carts.update_cart(session_id, item_id, count)
-        except:
-            abort(404)
+        if not isinstance(count, int):
+            # Count is not a number (bad request).
+            abort(400)
+
+        item = items.get(item_id)
+        if item is None:
+            # Item does not exist.
+            abort(404)  # TODO: 400 bad request?
+
+        cart = carts.update(session_id, item, count)
+        return cart
 
     @ns.doc(description='Delete an item from cart.')
     @ns.response(200, 'Success', [cartItemModel])
@@ -112,21 +100,47 @@ class CartItem(Resource):
     @ns.response(403, 'Invalid Session-Id header')
     @ns.response(404, 'Item not found in cart')
     def delete(self, item_id):
-        session_id = _get_session_id()
-
+        session_id = check_session()
+        item = items.get(item_id)
         try:
-            return carts.update_cart(session_id, item_id, 0)
-        except:
+            cart = carts.remove(session_id, item)
+            return cart
+        except KeyError:
+            # Item is not in cart.
             abort(404)
 
 
-def _get_session_id():
+@ns.route('/users')
+class Users(Resource):
+    @ns.doc(description='Create a new user session.')
+    @ns.expect(ns.model('CreateUserRequest', {
+        'first_name': fields.String(default='Tom'),
+        'last_name': fields.String(default='Testersen'),
+    }))
+    @ns.response(200, 'Success', fields.String)
+    @ns.response(400, 'Invalid first or last name given')
+    def post(self):
+        payload = request.get_json()
+        first = payload.get('first_name', None)
+        last = payload.get('last_name', None)
+
+        try:
+            session_id = sessions.create(first, last)
+            return session_id
+        except:
+            abort(400)
+
+
+def check_session():
     session_id = request.headers.get('Session-Id')
 
     if session_id is None:
         abort(401)
 
-    if not session.check_session_id(session_id):
+    if not sessions.is_valid(session_id):
         abort(403)
 
     return session_id
+
+
+app.run()

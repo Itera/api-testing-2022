@@ -245,7 +245,7 @@
         "AddToCartRequest": {
             "properties": {
                 "item_id": {
-                    "type": "string"
+                    "type": "integer"
                 }
             },
             "type": "object"
