@@ -19,7 +19,18 @@ python --version
 If the default version is 2.x, you should probably run the commands below with
 `python3` instead.
 
+## Download project files
+
+If you have git installed, use git to clone project:
+```
+git clone https://github.com/Itera/api-testing-2022.git
+```
+or download directly project files
+[Download here](https://github.com/Itera/api-testing-2022/archive/refs/heads/main.zip)
+
 ## Initial setup
+
+Open a terminal and navigate to the project folder and run these commands 
 
 Install dependencies with
 
@@ -58,8 +69,8 @@ This starts your app on port http://localhost:5000
 Example of a list of items:
 
     ITEMS = [
-        {'id': 0, 'name': 'Bannana'},
-        {'id': 1, 'name': 'Apple'},
+        'Bannana',
+        'Apple',
     ]
 
 The very first endpoint will simply look something like:
@@ -72,21 +83,16 @@ The very first endpoint will simply look something like:
 
 You will need to create a cart of some kind, typically a simple array of items:
 
-    CART = [
-        {
-            'id': item['id'],
-            'name': item['name'],
-            'count': 1,
-        },
-        ...
-    ]
+    CART = {
+        'Bannana': { 'count': 1 } 
+    }
 
 The id for the item to be added should be found in the request payload:
 
     @app.post('/kiosk/cart')
     def add_to_cart():
         payload = request.get_json()
-        item_id = payload.get('item_id', None)
+        item_id = payload.get('item_name', None)
         ...
 
 Use Postman to test non-GET requests.
@@ -95,19 +101,22 @@ Use Postman to test non-GET requests.
 
 This is easy now, yes? If it's not, look at what you did in the first task ;)
 
-### 4. Create a cart PUT endpoint for updating the amount of an item in the cart
+### 4. Create a cart DELETE endpoint to delete an item from the cart
 
-The PUT endpoint should get the _item id_ from the url (as type `int`):
+The DELETE endpoint should also get the item from the url.
 
-    @app.put('/kiosk/cart/<int:item_id>')
-    def modify_count(item_id):
+### 5. Create a cart PUT endpoint for updating the amount of an item in the cart
+
+The PUT endpoint should get the _item name_ from the url (as type `str`):
+
+    @app.put('/kiosk/cart/<str:item_name>')
+    def modify_count(item_name):
         ...
 
-### 5. Create a cart DELETE endpoint to delete an item from the cart
 
-The DELETE endpoint should also get the item id from the url.
+## Bonus tasks:
 
-### 6. Create a user endpoint to create a session id tokens
+### 1. Create a user endpoint to create a session id tokens
 
 The user endpoint should get first and last name from the body, and return a
 _session id_ token (just a random string).
@@ -116,7 +125,7 @@ _session id_ token (just a random string).
 
 Store this session id somewhere, so it may be used for "authentication" later.
 
-### 7. Add session id as requirement in the header to cart endpoints to "secure" them
+### 2. Add session id as requirement in the header to cart endpoints to "secure" them
 
 Add `Session-Id` to the header of all four requests to /kiosk/cart in Postman.
 
