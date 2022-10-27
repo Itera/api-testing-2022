@@ -31,28 +31,33 @@ def add_to_cart():
         # Item does not exist.
         abort(404)  # TODO: 400 bad request?
 
-    if item_name in CARTS[session_id]:
-        CARTS[session_id][item_name]['count'] += 1
+    cart = get_cart(session_id)
+    if item_name in cart:
+        cart[item_name]['count'] += 1
     else:
-        CARTS[session_id][item_name] = {'count': 1}
+        cart[item_name] = {'count': 1}
 
-    return jsonify(CARTS[session_id])
+    return jsonify(cart)
 
 
 @app.get('/kiosk/cart')
 def view_cart():
     session_id = check_session()
-    return jsonify(CARTS[session_id])
+    cart = get_cart(session_id)
+    return jsonify(cart)
 
 
 @app.delete('/kiosk/cart/<item_name>')
 def delete_from_cart(item_name):
     session_id = check_session()
+    cart = get_cart(session_id)
     try:
-        return jsonify(CARTS[session_id].pop(item_name))
+        del cart[item_name]
     except KeyError:
         # Item is not in cart.
         abort(404)
+
+    return jsonify(cart)
 
 
 @app.put('/kiosk/cart/<item_name>')
@@ -70,12 +75,13 @@ def update_in_cart(item_name):
         # Count is not a number (bad request).
         abort(400)
 
-    if item_name in CARTS[session_id]:
-        CARTS[session_id][item_name]['count'] += count
+    cart = get_cart(session_id)
+    if item_name in cart:
+        cart[item_name]['count'] += count
     else:
-        CARTS[session_id][item_name] = {'count': count}
+        cart[item_name] = {'count': count}
 
-    return jsonify(CARTS[session_id][item_name])
+    return jsonify(cart)
 
 
 @app.post('/kiosk/users')
@@ -113,6 +119,13 @@ def check_session():
         abort(403)
 
     return session_id
+
+
+def get_cart(session_id):
+    if session_id not in CARTS:
+        CARTS[session_id] = {}
+
+    return CARTS[session_id]
 
 
 app.run()

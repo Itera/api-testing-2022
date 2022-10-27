@@ -36,7 +36,8 @@ def view_cart():
 
 @app.delete('/kiosk/cart/<item_name>')
 def delete_from_cart(item_name):
-    return jsonify(CART.pop(item_name))
+    del CART[item_name]
+    return jsonify(CART)
 
 
 @app.put('/kiosk/cart/<item_name>')
@@ -45,11 +46,11 @@ def update_in_cart(item_name):
     count = payload.get('count', None)
 
     if item_name in CART:
-        CART[item_name]['count'] += count
+        CART[item_name]['count'] = count
     else:
         CART[item_name] = {'count': count}
 
-    return jsonify(CART[item_name])
+    return jsonify(CART)
 
 
 app.run()

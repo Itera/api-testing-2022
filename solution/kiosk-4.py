@@ -36,7 +36,8 @@ def view_cart():
 
 @app.delete('/kiosk/cart/<item_name>')
 def delete_from_cart(item_name):
-    return jsonify(CART.pop(item_name))
+    del CART[item_name]
+    return jsonify(CART)
 
 
 app.run()

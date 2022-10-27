@@ -108,7 +108,7 @@ The DELETE endpoint should get the item name from the url:
     def delete_from_cart(item_name):
         ...
 
-It should also return the item that was deleted.
+The endpoint should also return the cart state.
 
 ### 5. Create a cart PUT endpoint for updating the amount of an item in the cart
 
@@ -118,7 +118,7 @@ The PUT endpoint should also get the item name from the url:
     def update_in_cart(item_name):
         ...
 
-## Bonus tasks:
+## Bonus tasks
 
 ### 1. Error handling
 

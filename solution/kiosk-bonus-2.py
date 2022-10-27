@@ -45,10 +45,12 @@ def view_cart():
 @app.delete('/kiosk/cart/<item_name>')
 def delete_from_cart(item_name):
     try:
-        return jsonify(CART.pop(item_name))
+        del CART[item_name]
     except KeyError:
         # Item is not in cart.
         abort(404)
+
+    return jsonify(CART)
 
 
 @app.put('/kiosk/cart/<item_name>')
@@ -69,7 +71,7 @@ def update_in_cart(item_name):
     else:
         CART[item_name] = {'count': count}
 
-    return jsonify(CART[item_name])
+    return jsonify(CART)
 
 
 @app.post('/kiosk/users')
