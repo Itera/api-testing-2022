@@ -32,7 +32,8 @@ Install dependencies with
 
     python -m pip install -r requirements.txt
 
-If the command 'python' doesn't work, try 'py'
+**If the command 'python' doesn't work, try 'py'**
+
 If you're having certificate issues (typically due to a proxy), you could tell Python to trust the two hosts:
 
     python -m pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
