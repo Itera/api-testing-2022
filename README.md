@@ -32,6 +32,7 @@ Install dependencies with
 
     python -m pip install -r requirements.txt
 
+If the command 'python' doesn't work, try 'py'
 If you're having certificate issues (typically due to a proxy), you could tell Python to trust the two hosts:
 
     python -m pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
@@ -52,7 +53,7 @@ To get up and running, create a Flask app by putting the following in `kiosk.py`
 
 Run the app with
 
-    python kiosk.py
+    python kiosk.py (or kiosk-swagger.py if you are using the solution folder provided)
 
 This starts your app at http://localhost:5000 (or http://127.0.0.1:5000).
 
